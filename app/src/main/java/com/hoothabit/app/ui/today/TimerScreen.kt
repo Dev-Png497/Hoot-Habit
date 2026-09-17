@@ -105,7 +105,7 @@ fun TimerScreen(
 
         Spacer(Modifier.height(48.dp))
 
-        Row(horizontalAlignment = Alignment.CenterVertically, verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             if (timerState.isPaused) {
                 HootPrimaryButton(
                     text = "Resume",
