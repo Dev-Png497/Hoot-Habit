@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -130,35 +128,40 @@ fun TwentyOneDayGrid(
     totalDays: Int = 21
 ) {
     val byDate = records.associateBy { it.habitDate }
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(7),
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-        userScrollEnabled = false
-    ) {
-        items(totalDays) { index ->
-            val date = startDate.plusDays(index.toLong())
-            val record = byDate[date]
-            val state = when {
-                record?.state == DayState.COMPLETED -> DotState.COMPLETED
-                record?.state == DayState.NIGHT_WATCH -> DotState.PROTECTED
-                record?.state == DayState.MISSED -> DotState.MISSED
-                date.isAfter(today) -> DotState.UPCOMING
-                date.isBefore(today) -> DotState.MISSED
-                else -> DotState.UPCOMING // today, not yet logged
-            }
-            Box(modifier = Modifier.aspectRatio(1f), contentAlignment = Alignment.Center) {
-                HabitDayDot(
-                    state = state,
-                    isToday = date == today,
-                    accent = accent,
-                    missedColor = missedColor,
-                    protectedColor = protectedColor,
-                    idleColor = idleColor,
-                    backgroundColor = backgroundColor,
-                    size = 16.dp
-                )
+    // A plain (non-lazy) grid: LazyVerticalGrid crashes here because this is
+    // always nested inside an already-scrollable Column (infinite height
+    // constraint), and 21-ish dots never need laziness anyway.
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        val rows = (totalDays + 6) / 7
+        for (row in 0 until rows) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                for (col in 0 until 7) {
+                    val index = row * 7 + col
+                    Box(modifier = Modifier.weight(1f).aspectRatio(1f), contentAlignment = Alignment.Center) {
+                        if (index < totalDays) {
+                            val date = startDate.plusDays(index.toLong())
+                            val record = byDate[date]
+                            val state = when {
+                                record?.state == DayState.COMPLETED -> DotState.COMPLETED
+                                record?.state == DayState.NIGHT_WATCH -> DotState.PROTECTED
+                                record?.state == DayState.MISSED -> DotState.MISSED
+                                date.isAfter(today) -> DotState.UPCOMING
+                                date.isBefore(today) -> DotState.MISSED
+                                else -> DotState.UPCOMING // today, not yet logged
+                            }
+                            HabitDayDot(
+                                state = state,
+                                isToday = date == today,
+                                accent = accent,
+                                missedColor = missedColor,
+                                protectedColor = protectedColor,
+                                idleColor = idleColor,
+                                backgroundColor = backgroundColor,
+                                size = 16.dp
+                            )
+                        }
+                    }
+                }
             }
         }
     }
