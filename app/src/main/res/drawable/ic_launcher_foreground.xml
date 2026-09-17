@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Owl body, centered/scaled within the 108x108 safe zone -->
+    <path
+        android:fillColor="#1C1C20"
+        android:pathData="M54,26 C34,26 22,44 22,64 C22,84 36,94 54,94 C72,94 86,84 86,64 C86,44 74,26 54,26 Z" />
+    <path
+        android:fillColor="#E8E8EC"
+        android:pathData="M40,58 m-11,0 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0" />
+    <path
+        android:fillColor="#E8E8EC"
+        android:pathData="M68,58 m-11,0 a11,11 0 1,0 22,0 a11,11 0 1,0 -22,0" />
+    <path
+        android:fillColor="#5AC8FA"
+        android:pathData="M40,58 m-4.5,0 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0" />
+    <path
+        android:fillColor="#5AC8FA"
+        android:pathData="M68,58 m-4.5,0 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0" />
+    <path
+        android:fillColor="#5AC8FA"
+        android:pathData="M54,67 L49,75 L59,75 Z" />
+</vector>

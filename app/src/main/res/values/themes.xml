@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.HootHabit" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#0B0B0D</item>
+        <item name="android:navigationBarColor">#0B0B0D</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">false</item>
+        <item name="android:windowBackground">@color/hoot_background</item>
+    </style>
+
+    <style name="Theme.HootHabit.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/hoot_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_owl_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.HootHabit</item>
+    </style>
+</resources>

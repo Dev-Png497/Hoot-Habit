@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hoot Habit</string>
+    <string name="tagline">One habit. Start with 21 days. Keep going.</string>
+
+    <string name="notification_channel_reminders">Habit Reminders</string>
+    <string name="notification_channel_reminders_desc">Reminders to complete your daily habit</string>
+    <string name="notification_channel_timer">Active Timer</string>
+    <string name="notification_channel_timer_desc">Shows your running habit timer</string>
+    <string name="notification_channel_milestones">Milestones</string>
+    <string name="notification_channel_milestones_desc">Celebrates milestones you reach</string>
+
+    <string name="widget_description_small">Streak and today\'s status</string>
+    <string name="widget_description_medium">21-day foundation progress</string>
+</resources>
