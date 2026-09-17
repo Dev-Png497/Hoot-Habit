@@ -16,15 +16,23 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import com.hoothabit.app.HootHabitApp
+import com.hoothabit.app.data.prefs.UserSettings
+import com.hoothabit.app.data.repo.MilestoneAchievement
 import com.hoothabit.app.ui.insights.InsightsScreen
 import com.hoothabit.app.ui.journey.JourneyScreen
 import com.hoothabit.app.ui.settings.SettingsScreen
+import com.hoothabit.app.ui.share.MilestoneScreen
+import com.hoothabit.app.ui.share.ShareCardScreen
 import com.hoothabit.app.ui.theme.LocalHootColors
 import com.hoothabit.app.ui.today.TodayScreen
 
@@ -40,7 +48,39 @@ private val TABS = listOf(
 @Composable
 fun HootApp() {
     val colors = LocalHootColors.current
+    val context = LocalContext.current
+    val app = context.applicationContext as HootHabitApp
     var selected by remember { mutableIntStateOf(0) }
+
+    val activeHabit by app.repository.observeActiveHabit().collectAsState(initial = null)
+    val settings by app.userPrefs.settings.collectAsState(initial = UserSettings())
+
+    var celebrating by remember { mutableStateOf<MilestoneAchievement?>(null) }
+    var sharing by remember { mutableStateOf<MilestoneAchievement?>(null) }
+
+    when {
+        sharing != null -> {
+            ShareCardScreen(
+                achievement = sharing!!,
+                habitName = activeHabit?.name ?: "",
+                defaultSettings = settings,
+                onBack = { sharing = null }
+            )
+            return
+        }
+        celebrating != null -> {
+            MilestoneScreen(
+                achievement = celebrating!!,
+                habitName = activeHabit?.name ?: "",
+                onKeepGoing = { celebrating = null },
+                onShare = {
+                    sharing = celebrating
+                    celebrating = null
+                }
+            )
+            return
+        }
+    }
 
     Scaffold(
         containerColor = colors.background,
@@ -71,7 +111,7 @@ fun HootApp() {
                 .fillMaxSize()
         ) {
             when (selected) {
-                0 -> TodayScreen(onOpenMilestone = { /* milestone celebration screen added in a later pass */ })
+                0 -> TodayScreen(onOpenMilestone = { celebrating = it })
                 1 -> JourneyScreen()
                 2 -> InsightsScreen()
                 3 -> SettingsScreen()

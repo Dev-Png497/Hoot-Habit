@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hoothabit.app.data.db.entity.HabitEntity
 import com.hoothabit.app.data.prefs.AppTheme
+import com.hoothabit.app.data.prefs.NotificationStyle
 import com.hoothabit.app.data.prefs.UserPrefs
 import com.hoothabit.app.data.prefs.UserSettings
 import com.hoothabit.app.data.repo.HabitRepository
+import com.hoothabit.app.notifications.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -35,8 +37,24 @@ class SettingsViewModel(
     fun setTheme(theme: AppTheme) = viewModelScope.launch { userPrefs.setTheme(theme) }
     fun setTrueBlack(enabled: Boolean) = viewModelScope.launch { userPrefs.setTrueBlackBackgrounds(enabled) }
     fun setHaptics(enabled: Boolean) = viewModelScope.launch { userPrefs.setHapticsEnabled(enabled) }
+    fun setNotificationStyle(style: NotificationStyle) = viewModelScope.launch { userPrefs.setNotificationStyle(style) }
     fun setSound(enabled: Boolean) = viewModelScope.launch { userPrefs.setSoundEnabled(enabled) }
-    fun setReminder1(enabled: Boolean, minuteOfDay: Int) = viewModelScope.launch { userPrefs.setReminder1(enabled, minuteOfDay) }
+    fun setReminder1(enabled: Boolean, minuteOfDay: Int) = viewModelScope.launch {
+        userPrefs.setReminder1(enabled, minuteOfDay)
+        if (enabled) {
+            ReminderScheduler.scheduleDaily(appContext, minuteOfDay, ReminderScheduler.REQUEST_CODE_REMINDER_1)
+        } else {
+            ReminderScheduler.cancel(appContext, ReminderScheduler.REQUEST_CODE_REMINDER_1)
+        }
+    }
+    fun setReminder2(enabled: Boolean, minuteOfDay: Int) = viewModelScope.launch {
+        userPrefs.setReminder2(enabled, minuteOfDay)
+        if (enabled) {
+            ReminderScheduler.scheduleDaily(appContext, minuteOfDay, ReminderScheduler.REQUEST_CODE_REMINDER_2)
+        } else {
+            ReminderScheduler.cancel(appContext, ReminderScheduler.REQUEST_CODE_REMINDER_2)
+        }
+    }
     fun setDayCutoff(hour: Int) = viewModelScope.launch {
         userPrefs.setDayCutoffHour(hour)
         state.value.habit?.let { repository.updateDayCutoff(it.id, hour) }

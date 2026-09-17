@@ -1,9 +1,11 @@
 package com.hoothabit.app.ui.onboarding
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hoothabit.app.data.prefs.UserPrefs
 import com.hoothabit.app.data.repo.HabitRepository
+import com.hoothabit.app.notifications.ReminderScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -33,7 +35,8 @@ data class OnboardingState(
 
 class OnboardingViewModel(
     private val repository: HabitRepository,
-    private val userPrefs: UserPrefs
+    private val userPrefs: UserPrefs,
+    private val appContext: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OnboardingState())
@@ -80,6 +83,12 @@ class OnboardingViewModel(
             userPrefs.setReminder1(s.reminder1Enabled, s.reminder1MinuteOfDay)
             userPrefs.setReminder2(s.reminder2Enabled, s.reminder2MinuteOfDay)
             userPrefs.setOnboardingCompleted(true)
+            if (s.reminder1Enabled) {
+                ReminderScheduler.scheduleDaily(appContext, s.reminder1MinuteOfDay, ReminderScheduler.REQUEST_CODE_REMINDER_1)
+            }
+            if (s.reminder2Enabled) {
+                ReminderScheduler.scheduleDaily(appContext, s.reminder2MinuteOfDay, ReminderScheduler.REQUEST_CODE_REMINDER_2)
+            }
             _state.update { it.copy(isSubmitting = false, completedHabitId = habitId) }
         }
     }

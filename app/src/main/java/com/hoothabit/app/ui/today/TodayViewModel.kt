@@ -1,6 +1,7 @@
 package com.hoothabit.app.ui.today
 
 import android.content.Context
+import androidx.glance.appwidget.updateAll
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hoothabit.app.data.db.entity.DailyRecordEntity
@@ -118,14 +119,22 @@ class TodayViewModel(
         val beforeStreak = state.value.streak
         val beforeMinutes = state.value.stats?.totalMinutesInvested ?: 0
         viewModelScope.launch {
-            repository.logCompletion(habit, targetDate, minutes, source, manual, retroactive)
+            val record = repository.logCompletion(habit, targetDate, minutes, source, manual, retroactive)
             val afterRecords = repository.getAllRecords(habit.id)
             val today = HabitDayUtils.currentHabitDate(habit.dayCutoffHour)
             val afterStreak = StreakCalculator.calculate(habit.startDate, today, afterRecords)
             val afterMinutes = afterRecords.sumOf { it.totalDurationMinutes }
             val settings = state.value.settings
+            if (targetDate == today && record.state == com.hoothabit.app.data.db.entity.DayState.COMPLETED) {
+                com.hoothabit.app.notifications.ReminderScheduler.skipTodayAndResumeTomorrow(
+                    appContext,
+                    reminder1Minute = settings.reminder1MinuteOfDay.takeIf { settings.reminder1Enabled },
+                    reminder2Minute = settings.reminder2MinuteOfDay.takeIf { settings.reminder2Enabled }
+                )
+            }
             repository.maybeEarnNightWatch(habit, NightWatchRules(settings.nightWatchDaysToEarn, settings.nightWatchMaxStored))
             val milestones = repository.checkAndRecordMilestones(habit)
+            com.hoothabit.app.widget.HootWidget().updateAll(appContext)
             val insight = InsightEngine.pickPostCompletionInsight(beforeStreak, afterStreak, beforeMinutes, afterMinutes)
             _events.value = TodayEvent.Completed(insight, milestones)
         }

@@ -19,7 +19,7 @@ class HootViewModelFactory(private val app: HootHabitApp) : ViewModelProvider.Fa
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         @Suppress("UNCHECKED_CAST")
         return when (modelClass) {
-            OnboardingViewModel::class.java -> OnboardingViewModel(app.repository, app.userPrefs) as T
+            OnboardingViewModel::class.java -> OnboardingViewModel(app.repository, app.userPrefs, app) as T
             TodayViewModel::class.java -> TodayViewModel(app.repository, app.userPrefs, app) as T
             JourneyViewModel::class.java -> JourneyViewModel(app.repository) as T
             InsightsViewModel::class.java -> InsightsViewModel(app.repository) as T

@@ -30,9 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hoothabit.app.data.prefs.AppTheme
+import com.hoothabit.app.data.prefs.NotificationStyle
 import com.hoothabit.app.ui.common.HootCard
 import com.hoothabit.app.ui.common.HootOutlinedButton
 import com.hoothabit.app.ui.common.HootViewModelFactory
+import com.hoothabit.app.ui.common.formatMinuteOfDay
 import com.hoothabit.app.ui.theme.LocalHootColors
 import com.hoothabit.app.ui.theme.paletteFor
 
@@ -108,6 +110,59 @@ fun SettingsScreen() {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Sound", color = colors.textSecondary)
                 Switch(checked = state.settings.soundEnabled, onCheckedChange = { viewModel.setSound(it) })
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        HootCard {
+            Text("Reminders", style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
+            Spacer(Modifier.height(10.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Remind me at ${formatMinuteOfDay(state.settings.reminder1MinuteOfDay)}", color = colors.textSecondary)
+                Switch(
+                    checked = state.settings.reminder1Enabled,
+                    onCheckedChange = { viewModel.setReminder1(it, state.settings.reminder1MinuteOfDay) }
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(listOf("Morning" to 8 * 60, "Afternoon" to 14 * 60, "Evening" to 20 * 60)) { (label, minute) ->
+                    val selected = state.settings.reminder1MinuteOfDay == minute
+                    Text(
+                        label,
+                        color = if (selected) colors.onAccent else colors.textPrimary,
+                        modifier = Modifier
+                            .background(if (selected) colors.accent else colors.surfaceElevated, RoundedCornerShape(50))
+                            .clickable { viewModel.setReminder1(true, minute) }
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(18.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("If I still haven't, remind again at ${formatMinuteOfDay(state.settings.reminder2MinuteOfDay)}", color = colors.textSecondary)
+                Switch(
+                    checked = state.settings.reminder2Enabled,
+                    onCheckedChange = { viewModel.setReminder2(it, state.settings.reminder2MinuteOfDay) }
+                )
+            }
+
+            Spacer(Modifier.height(18.dp))
+            Text("Notification style", style = MaterialTheme.typography.bodyMedium, color = colors.textSecondary)
+            Spacer(Modifier.height(8.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                items(NotificationStyle.entries.toList()) { style ->
+                    val selected = state.settings.notificationStyle == style
+                    Text(
+                        style.name.lowercase().replaceFirstChar { it.uppercase() },
+                        color = if (selected) colors.onAccent else colors.textPrimary,
+                        modifier = Modifier
+                            .background(if (selected) colors.accent else colors.surfaceElevated, RoundedCornerShape(50))
+                            .clickable { viewModel.setNotificationStyle(style) }
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                    )
+                }
             }
         }
 
